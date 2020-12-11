@@ -1,85 +1,89 @@
-function power(base, exp){
-    if (exp == 1){
-        return (base)}
-    if (exp != 1){
-        return (base * power(base, exp - 1))}
-    }
-    alert (power(3, 4));//81
+class IdManager{
 
-    /* Задача 1. С помощью цикла while вывести все простые числа в промежутке от 0 до 100.*/
-   /* 1. Создаем массив от 1 до 100. Честно, пользовалась подсказкой в интернете...*/
-var arr = [];
-var end = 1;
-while (end < 100){
-    end++;
-    arr.push(end);
+constructor () {
+  this.currentId = 0;
 }
-//     2. Удаляем все четные цифры (разбиралась долго, но предпочла просто это запомнит! 
-/*Точнее: изучила синтаксис indexOf )*/
-var a = 2;
-var b = 2;
-while (a <= 100){
-    a += b;
-        arr.splice(arr.indexOf(a), 1);
+getId(){
+  return this.currentId++
 }
-//     3. Удаляет все цифры которые деляться на нечетные до 10
-/* Здесь все понятно, используем нечетные в = 3,5,7*/
-a = 4;
-b = 3;
-while (a < 100){
-    if (a % b ===0 && arr.indexOf(a) !== -1){
-        arr.splice(arr.indexOf(a), 1);
-    }else {
-        a++;
-    }
+}
+ 
+class Good {
+  constructor (id, name, price){
+    this.id = id,
+    this.name = name,
+    this.price = price
+  }
+  getElement (listener){
+    const cardEl = document.createElement('div');
+    cardEl.classList.add('card');
+    const headerEl = document.createElement('h2');
+    headerEl.textContent = this.name;
+    const priceEl = document.createElement('p');
+    priceEl.classList.add('price');
+    priceEl.textContent = this.price;
+    cardEl.appendChild(headerEl);
+    cardEl.appendChild(priceEl);
+    cardEl.addEventListener('click', () => { listener (this.id) });
+    return cardEl;
+  }
 }
 
-a = 6;
-b = 5;
-while (a < 100) {
-    if (a % b === 0 && arr.indexOf(a) !== -1) {
-        arr.splice(arr.indexOf(a), 1);
-    } else {
-        a++;
-    }
+class Goods{
+  constructor (goodsList){
+    this._store = goodsList;
+    this.cart = new Cart();
+    this.idManager = new IdManager();
+    this.render();
+  }
+buy (id){
+  const good = this._store.find((el)=>el.id == id);
+  if (good){
+        this.cart.add(
+      new Good(this.idManager.getId, good.name, good.price)
+      );
+  }
+}
+render(){
+  const goodsEl = document.querySelector('#goods');
+  this._store.forEach(good => {
+    goodsEl.appendChild(good.getElement(this.buy.bind(this)));
+  });
+}
 }
 
-a = 8;
-b = 7;
-while (a < 100) {
-    if (a % b === 0 && arr.indexOf(a) !== -1) {
-        arr.splice(arr.indexOf(a), 1);
-    } else {
-        a++;
-    }
+class Cart {
+constructor(){
+  this.cartEl = document.querySelector('#cart');
+  this._store = [];
+  this.idManager = new IdManager();
+  this.render();
+}
+add (good){
+  this._store.push({id: this.idManager.getId(), ...good});
+  this.render ();
 }
 
-console.log(arr); // получилась!
-
-let cart = [
-    ['socks', 100],
-    ['undershirt', 200],
-    ['underpants', 300],
-]
-
-function underwear(names){
-    let total = 0;
-    for (let i = names.length-1; i >= 0; i--) {
-       total += names[i][1];
-    }
-       return total;
+delete (id){
+  this._store = this._store.filter((el)=>el.id!==id);
 }
-console.log(underwear(cart));
+getPrice(){
+  return this._store.reduce((total, good) => total + good.price, 0)
+}
+render (cart){
+  this.cartEl.textContent = '';
+  const totalEl = document.createElement ('p');
+  totalEl.textContent = `В корзине ${this._store.length} товаров, на сумму ${this.getPrice(this._store)} рублей.`
+  this.cartEl.appendChild (totalEl);
+  
+  console.log (this._store)
+}
+}   
 
-var i;
-        for ( i = 0; i <= 9; i++){
-            console.log(i);
-        }
+const goods = new Goods ([
+  new Good(0, 'Socks', 100),
+  new Good(1, 'Undershirt', 200),
+  new Good(2, 'Underpants', 300)
+])
 
-        var arr = [];
-        var end = 0;
-        while (end < 20){
-            end++;
-            arr.push('x');
-            console.log(arr);
-        }
+
